@@ -12,14 +12,22 @@ static int WINDOW_WIDTH = 1600;
 static int WINDOW_HEIGHT = 800;
 
 struct Circle {
-  float x;
-  float y;
+  double x;
+  double y;
   double radius;
 };
 
 void CreateCircle(SDL_Renderer *renderer, struct Circle circle) {
-  for(int i = 0; i < 360; i++) {
-    SDL_RenderPoint(renderer, circle.x + circle.radius * cos(i), circle.y +  circle.radius * sin(i));
+  
+  double raidus_squared = pow(circle.radius, 2);
+ 
+  for(double x = circle.x - circle.radius; x <= circle.x + circle.radius; x++) {
+    for(double y = circle.y - circle.radius; y <= circle.y + circle.radius; y++) {
+      double distance_squared = pow(x - circle.x, 2) + pow(y - circle.y, 2);
+      if(distance_squared < raidus_squared) {
+        SDL_RenderPoint(renderer, x, y);
+      }
+    }
   }
 }
 
@@ -40,21 +48,21 @@ int main() {
 
   SDL_Event event;
   bool running = true;
-
+  Circle circle = {800, 400, 100};
   while (running) {
     while (SDL_PollEvent(&event)) {
-      if  (event.type == SDL_EVENT_QUIT) {
+      if(event.type == SDL_EVENT_QUIT) {
         running = false;
+      }
+      if(event.type == SDL_EVENT_MOUSE_MOTION && event.motion.state == true) {
+        circle.x = event.motion.x;
+        circle.y = event.motion.y;
       }
     }
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    Circle circle;
-    circle.x = 200;
-    circle.y = 200;
-    circle.radius = 50;
     CreateCircle(renderer, circle);
 
     SDL_RenderPresent(renderer);
