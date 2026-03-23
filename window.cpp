@@ -31,6 +31,18 @@ void CreateCircle(SDL_Renderer *renderer, struct Circle circle) {
   }
 }
 
+void CreateLight(SDL_Renderer *renderer, struct Circle source) {
+  for(int i = 0; i < 360; i++) {
+    SDL_RenderLine(
+        renderer,
+        source.x + source.radius * cos(i),
+        source.y + source.radius * sin(i),
+        (WINDOW_WIDTH - source.x) * cos(i),
+        (WINDOW_HEIGHT - source.y) * sin(i)
+        );
+  }
+}
+
 int main() {
   if(!SDL_Init(SDL_INIT_VIDEO)) {
     std::cerr << "SDL_Init error: " << SDL_GetError() << "\n";
@@ -49,14 +61,29 @@ int main() {
   SDL_Event event;
   bool running = true;
   Circle circle = {800, 400, 100};
+  Circle source = {200, 200, 40};
   while (running) {
     while (SDL_PollEvent(&event)) {
       if(event.type == SDL_EVENT_QUIT) {
         running = false;
       }
-      if(event.type == SDL_EVENT_MOUSE_MOTION && event.motion.state == true) {
+      if(event.type == SDL_EVENT_MOUSE_MOTION && 
+          event.motion.state == true && 
+          event.motion.x > circle.x-circle.radius &&
+          event.motion.y > circle.y-circle.radius &&
+          event.motion.x < circle.x+circle.radius &&
+          event.motion.y < circle.y+circle.radius) {
         circle.x = event.motion.x;
         circle.y = event.motion.y;
+      }
+      if(event.type == SDL_EVENT_MOUSE_MOTION && 
+          event.motion.state == true && 
+          event.motion.x > source.x-source.radius &&
+          event.motion.y > source.y-source.radius &&
+          event.motion.x < source.x+source.radius &&
+          event.motion.y < source.y+source.radius) {
+        source.x = event.motion.x;
+        source.y = event.motion.y;
       }
     }
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -64,6 +91,12 @@ int main() {
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     CreateCircle(renderer, circle);
+
+    SDL_SetRenderDrawColor(renderer, 255, 247, 0, 255);
+    CreateCircle(renderer, source);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    CreateLight(renderer, source);
 
     SDL_RenderPresent(renderer);
   }
