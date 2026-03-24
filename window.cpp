@@ -37,8 +37,8 @@ void CreateLight(SDL_Renderer *renderer, struct Circle source) {
         renderer,
         source.x + source.radius * cos(i),
         source.y + source.radius * sin(i),
-        (WINDOW_WIDTH - source.x) * cos(i),
-        (WINDOW_HEIGHT - source.y) * sin(i)
+        (WINDOW_WIDTH * cos(i)) * 10,
+        (WINDOW_HEIGHT * sin(i)) * 10
         );
   }
 }
